@@ -1,0 +1,57 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}NBA Fan Zone - Predict{% endblock %}
+{% block predict_active %}active{% endblock %}
+
+{% block content %}
+<main>
+    <section class="predict-section">
+        <div class="predict-container">
+            <h1>NBA Game Predictor</h1>
+            <form action="{% url 'predict:predict' %}" method="POST">
+                {% csrf_token %}
+                <div class="predict-grid">
+                    <!-- Team 1 -->
+                    <div class="team-selection-group">
+                        <label for="conference1">Conference</label>
+                        <select id="conference1" class="predict-select">
+                            <option value="">Select...</option>
+                            <option value="eastern">Eastern</option>
+                            <option value="western">Western</option>
+                        </select>
+                        <label for="team1">Team 1</label>
+                        <select id="team1" name="team1" class="predict-select" disabled></select>
+                        <div id="team1-logo" style="display: none;"><img src="" class="team-logo-img" /></div>
+                    </div>
+
+                    <div class="vs-divider"><span>VS</span></div>
+
+                    <!-- Team 2 -->
+                    <div class="team-selection-group">
+                        <label for="conference2">Conference</label>
+                        <select id="conference2" class="predict-select">
+                            <option value="">Select...</option>
+                            <option value="eastern">Eastern</option>
+                            <option value="western">Western</option>
+                        </select>
+                        <label for="team2">Team 2</label>
+                        <select id="team2" name="team2" class="predict-select" disabled></select>
+                        <div id="team2-logo" style="display: none;"><img src="" class="team-logo-img" /></div>
+                    </div>
+                </div>
+                <button class="predict-button" disabled>Generate Prediction</button>
+            </form>
+            <div class="predict-result">
+                <h2>Predict Reason</h2>
+                {% if winner %}
+                    <div class="result-box"><h3>{{ winner }}</h3></div>
+                {% else %}
+                    <p>Select Teams</p>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+    <script src="{% static 'predict/js/predict.js' %}"></script>
+</main>
+{% endblock %}

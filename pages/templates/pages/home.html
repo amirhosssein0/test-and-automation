@@ -1,0 +1,44 @@
+{% extends 'base/base.html' %}
+
+{% block title %}NBA Fan Zone - Home{% endblock title %}
+{% block home_active %}active{% endblock home_active %}
+
+{% block content %}
+    <main>
+        <section class="hero">
+            <div class="basketball-animation"></div>
+            <div class="hero-content">
+                <h1 class="fade-in">Welcome to NBA Fan Zone</h1>
+                <p class="slide-in">Your ultimate destination for NBA news, stats, and updates</p>
+                <div class="hero-buttons">
+                    <a href="{% url "predict:predict" %}" class="cta-button">Predict Now</a>
+                    <a href="{% url "accounts:signup" %}" class="cta-button secondary">Join Now</a>
+                </div>
+            </div>
+            <div class="hero-image">
+                <img src="https://wallpapers.com/images/hd/nba-logo-eh22o2twxka9b9ju.jpg" alt="LeBron James" class="lebron-image">
+            </div>
+        </section>
+
+        <section id="featured" class="featured">
+            <h2>Featured Content</h2>
+            <div class="featured-grid">
+                <div class="featured-card">
+                    <img src="https://4kwallpapers.com/images/wallpapers/basketball-do-it-now-3d-background-750x1334-3746.jpg" alt="NBA Game">
+                    <h3>Latest Games</h3>
+                    <p>Stay updated with the most recent NBA games, scores, and highlights.</p>
+                </div>
+                <div class="featured-card">
+                    <img src="https://i.pinimg.com/736x/6c/f2/f5/6cf2f59f0cf1b9689c12998e5d231546.jpg" alt="Player Stats">
+                    <h3>Player Stats</h3>
+                    <p>Track your favorite players' performance with detailed statistics and analysis.</p>
+                </div>
+                <div class="featured-card">
+                    <img src="https://w0.peakpx.com/wallpaper/560/470/HD-wallpaper-basketball-layup-sport.jpg" alt="NBA News">
+                    <h3>Latest News</h3>
+                    <p>Get the latest updates, trades, and news from around the NBA.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+{% endblock content %}
