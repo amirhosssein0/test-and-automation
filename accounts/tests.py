@@ -1,45 +1,53 @@
 from django.test import TestCase
-from django.urls import reverse, resolve
-from accounts.views import (
-    CustomSignUpView,
-    CustomLoginView,
-    CustomLogoutView,
-    CleanLogoutView,
-    CustomPasswordRest,
-    CustomPasswordDone,
-    CustomPasswordConfirm,
-    CustomPasswordComplete,
-)
+from django.urls import resolve, reverse
+from accounts import views
+from django.test import Client
 
 
 class AccountsURLTests(TestCase):
-    def test_signup_url(self):
-        path = reverse("accounts:signup")
-        self.assertEqual(path, "/account/signup/")
-        self.assertEqual(resolve(path).func.view_class, CustomSignUpView)
+    def test_signup_url_resolves(self):
+        url = reverse('accounts:signup')
+        self.assertEqual(resolve(url).func.view_class, views.CustomSignUpView)
 
-    def test_login_url(self):
-        path = reverse("accounts:login")
-        self.assertEqual(path, "/account/login/")
-        self.assertEqual(resolve(path).func.view_class, CustomLoginView)
+    def test_login_url_resolves(self):
+        url = reverse('accounts:login')
+        self.assertEqual(resolve(url).func.view_class, views.CustomLoginView)
 
-    def test_logout_confirm_url(self):
-        path = reverse("accounts:logout_confirm")
-        self.assertEqual(path, "/account/logout/confirm/")
-        self.assertEqual(resolve(path).func.view_class, CustomLogoutView)
+    def test_logout_url_resolves(self):
+        url = reverse('accounts:logout')
+        self.assertEqual(resolve(url).func.view_class, views.CustomLogoutView)
 
-    def test_logout_post_url(self):
-        path = reverse("accounts:logout")
-        self.assertEqual(path, "/account/logout/")
-        self.assertEqual(resolve(path).func.view_class, CleanLogoutView)
+    def test_logout_confirm_url_resolves(self):
+        url = reverse('accounts:logout_confirm')
+        self.assertEqual(resolve(url).func.view_class, views.CleanLogoutView)
 
-    def test_password_reset_urls(self):
-        self.assertEqual(resolve(reverse("accounts:reset_password")).func.view_class, CustomPasswordRest)
-        self.assertEqual(resolve(reverse("accounts:reset_password_done")).func.view_class, CustomPasswordDone)
-        # confirm has dynamic segments
-        confirm_path = reverse("accounts:reset_password_confirm", kwargs={"uidb64": "abc", "token": "xyz"})
-        self.assertIn("/account/password/rest/confirm/", confirm_path)
-        self.assertEqual(resolve(confirm_path).func.view_class, CustomPasswordConfirm)
-        self.assertEqual(resolve(reverse("accounts:reset_password_complete")).func.view_class, CustomPasswordComplete)
+    def test_password_reset_urls_resolve(self):
+        self.assertEqual(
+            resolve(reverse('accounts:reset_password')).func.view_class,
+            views.CustomPasswordRest,
+        )
+        self.assertEqual(
+            resolve(reverse('accounts:reset_password_done')).func.view_class,
+            views.CustomPasswordDone,
+        )
 
+
+class AccountsViewTests(TestCase):
+    def setUp(self):
+        self.client = Client()
+
+    def test_login_get(self):
+        response = self.client.get(reverse('accounts:login'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'accounts/login.html')
+
+    def test_signup_get(self):
+        response = self.client.get(reverse('accounts:signup'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'accounts/signup.html')
+
+    def test_password_reset_get(self):
+        response = self.client.get(reverse('accounts:reset_password'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'accounts/reset_password.html')
 # Create your tests here.

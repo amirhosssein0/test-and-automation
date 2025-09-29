@@ -972,6 +972,7 @@ footer {
 }
 
 .team-logo-img {
+    width: 200px;
     transition: transform 0.3s ease;
 }
 
