@@ -36,7 +36,6 @@ jobs:
           python manage.py migrate --noinput
           python manage.py test
 
-      # 6) Set up Node.js
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
@@ -59,5 +58,7 @@ jobs:
         working-directory: ./e2e
 
       - name: Run Playwright tests
-        run: npm run test:e2e
+        env:
+          DJANGO_SETTINGS_MODULE: config.settings
+        run: npm run playwright-test --silent
         working-directory: ./e2e

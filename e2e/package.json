@@ -4,6 +4,8 @@
   "description": "Playwright E2E tests for NBA-WEB",
   "main": "index.js",
   "scripts": {
+    "devserver": "python ../manage.py runserver 127.0.0.1:8000 --noreload --insecure",
+    "playwright-test": "playwright test",
     "test:e2e": "playwright test"
   },
   "keywords": [],

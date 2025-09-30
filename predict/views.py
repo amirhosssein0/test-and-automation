@@ -1,10 +1,15 @@
 import joblib
 import pandas as pd
 from django.shortcuts import render
+from django.conf import settings
+from pathlib import Path
  
 
-model = joblib.load('predict/PredictModel/nba_winner_model.pkl')
-le_team = joblib.load('predict/PredictModel/team_encoder.pkl')
+_model_path = settings.BASE_DIR / 'predict' / 'PredictModel' / 'nba_winner_model.pkl'
+_encoder_path = settings.BASE_DIR / 'predict' / 'PredictModel' / 'team_encoder.pkl'
+
+model = joblib.load(str(_model_path))
+le_team = joblib.load(str(_encoder_path))
 
 TEAM_MAPPING = {
     # Eastern Teams
