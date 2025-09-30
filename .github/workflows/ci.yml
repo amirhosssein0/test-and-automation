@@ -1,12 +1,9 @@
 name: Django + Playwright CI
 
 on:
-  pull_request:
-    branches:
-      - master
   push:
-    branches:
-      - master
+  pull_request:
+  workflow_dispatch:
 
 jobs:
   test:
@@ -21,8 +18,8 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Cache pip dependencies
-        uses: actions/cache@v3
+      - name: Cache pip
+        uses: actions/cache@v4
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
@@ -34,22 +31,33 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run migrations
-        run: python manage.py migrate
+      - name: Run Django migrations and tests
+        run: |
+          python manage.py migrate --noinput
+          python manage.py test
 
-      - name: Run Django tests
-        run: python manage.py test
-
+      # 6) Set up Node.js
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: "22"
 
-      - name: Install npm dependencies
-        run: npm install
+      - name: Cache npm
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.npm
+            e2e/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('e2e/package-lock.json', 'e2e/package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install npm deps & Playwright browsers
+        run: |
+          npm ci || npm install
+          npx playwright install --with-deps
         working-directory: ./e2e
 
       - name: Run Playwright tests
         run: npm run test:e2e
         working-directory: ./e2e
-
