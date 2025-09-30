@@ -47,7 +47,9 @@ jobs:
 
       - name: Install npm dependencies
         run: npm install
+        working-directory: ./e2e
 
       - name: Run Playwright tests
         run: npm run test:e2e
+        working-directory: ./e2e
 
