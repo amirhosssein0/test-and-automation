@@ -43,6 +43,18 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # Python برای Django
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # Node.js برای Playwright
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
@@ -69,9 +81,10 @@ jobs:
       - name: Install npm deps & Playwright browsers
         run: |
           npm ci
-          npm run install:playwright
+          npx playwright install --with-deps
         working-directory: ./e2e
 
+      # Playwright خودش سرور Django رو ران می‌کنه (با webServer)
       - name: Run Playwright tests
         run: npm run test:e2e
         working-directory: ./e2e
