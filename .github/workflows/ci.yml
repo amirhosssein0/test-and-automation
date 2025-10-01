@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  test:
+  django-tests:
     runs-on: ubuntu-latest
 
     steps:
@@ -34,7 +34,14 @@ jobs:
       - name: Run Django migrations and tests
         run: |
           python manage.py migrate --noinput
-          python manage.py test
+          python manage.py test --keepdb
+
+  playwright-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -51,14 +58,27 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-
 
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('e2e/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-
+
       - name: Install npm deps & Playwright browsers
         run: |
-          npm ci || npm install
-          npx playwright install --with-deps
+          npm ci
+          npm run install:playwright
         working-directory: ./e2e
 
       - name: Run Playwright tests
-        env:
-          DJANGO_SETTINGS_MODULE: config.settings
-        run: npm run playwright-test --silent
+        run: npm run test:e2e
         working-directory: ./e2e
+
+      - name: Upload Playwright Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: e2e/playwright-report
