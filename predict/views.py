@@ -8,21 +8,21 @@ from pathlib import Path
 _model_path = settings.BASE_DIR / 'predict' / 'PredictModel' / 'nba_winner_model.pkl'
 _encoder_path = settings.BASE_DIR / 'predict' / 'PredictModel' / 'team_encoder.pkl'
 
-# Lazy singletons for model and encoder to avoid import-time failures
-_model_instance = None
-_encoder_instance = None
+# Expose names expected by tests; they are lazily initialized
+model = None
+le_team = None
 
 def get_model():
-    global _model_instance
-    if _model_instance is None:
-        _model_instance = joblib.load(str(_model_path))
-    return _model_instance
+    global model
+    if model is None:
+        model = joblib.load(str(_model_path))
+    return model
 
 def get_encoder():
-    global _encoder_instance
-    if _encoder_instance is None:
-        _encoder_instance = joblib.load(str(_encoder_path))
-    return _encoder_instance
+    global le_team
+    if le_team is None:
+        le_team = joblib.load(str(_encoder_path))
+    return le_team
 
 TEAM_MAPPING = {
     # Eastern Teams
@@ -58,7 +58,7 @@ def predict_winner(team1_value, team2_value):
         return team1 if prediction == 1 else team2
 
     except Exception:
-        return "Error in predict."
+        return "Error in predict ."
 
 def predict_winner_view(request):
     winner = None
