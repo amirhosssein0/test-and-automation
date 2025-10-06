@@ -3,13 +3,26 @@ import pandas as pd
 from django.shortcuts import render
 from django.conf import settings
 from pathlib import Path
- 
+
 
 _model_path = settings.BASE_DIR / 'predict' / 'PredictModel' / 'nba_winner_model.pkl'
 _encoder_path = settings.BASE_DIR / 'predict' / 'PredictModel' / 'team_encoder.pkl'
 
-model = joblib.load(str(_model_path))
-le_team = joblib.load(str(_encoder_path))
+# Lazy singletons for model and encoder to avoid import-time failures
+_model_instance = None
+_encoder_instance = None
+
+def get_model():
+    global _model_instance
+    if _model_instance is None:
+        _model_instance = joblib.load(str(_model_path))
+    return _model_instance
+
+def get_encoder():
+    global _encoder_instance
+    if _encoder_instance is None:
+        _encoder_instance = joblib.load(str(_encoder_path))
+    return _encoder_instance
 
 TEAM_MAPPING = {
     # Eastern Teams
@@ -35,15 +48,17 @@ def predict_winner(team1_value, team2_value):
         if not team1 or not team2:
             return "Invalid teams"
 
-        t1 = le_team.transform([team1])[0]
-        t2 = le_team.transform([team2])[0]
+        encoder = get_encoder()
+        t1 = encoder.transform([team1])[0]
+        t2 = encoder.transform([team2])[0]
 
         sample = pd.DataFrame([[t1, t2, 100, 100]], columns=['TEAM_1', 'TEAM_2', 'PTS_1', 'PTS_2'])
+        model = get_model()
         prediction = model.predict(sample)[0]
         return team1 if prediction == 1 else team2
 
-    except Exception as e:
-        return "Error in predict ."
+    except Exception:
+        return "Error in predict."
 
 def predict_winner_view(request):
     winner = None
